@@ -3,8 +3,9 @@
 //! Media bytes in `mdat` are never read. A truncated file without `moov` still
 //! yields a top-level box map so the GUI can point the user at extraction.
 
-mod boxes;
+pub mod application;
 pub mod domain;
+pub mod infrastructure;
 
 use std::path::Path;
 
@@ -14,18 +15,7 @@ pub use domain::boxes::fourcc;
 pub use domain::{Analysis, AudioInfo, LayoutSpan, SpanKind, VideoInfo, human_bytes};
 
 pub fn analyze(path: &Path) -> Result<Analysis> {
-    let (file_size, tops) = boxes::walk_file(path)?;
-    let parsed = domain::build(file_size, &tops);
-    Ok(Analysis {
-        path: path.to_path_buf(),
-        file_size,
-        duration_secs: parsed.duration_secs,
-        timescale: parsed.timescale,
-        video: parsed.video,
-        audio: parsed.audio,
-        spans: parsed.spans,
-        moov_present: parsed.moov_present,
-    })
+    application::analyze(path, &infrastructure::FileBoxSource)
 }
 
 #[cfg(test)]

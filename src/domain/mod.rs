@@ -2,7 +2,7 @@
 
 mod format;
 mod layout;
-pub(crate) mod boxes;
+pub mod boxes;
 mod model;
 
 pub use format::human_bytes;
