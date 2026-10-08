@@ -1,7 +1,7 @@
 //! Turns top-level boxes + sample tables into a byte-accurate file layout.
 
-use crate::boxes::{self, RawBox, TopLevelBox, fourcc, read_i32, read_u32, read_u64};
-use crate::{AudioInfo, LayoutSpan, SpanKind, VideoInfo};
+use super::boxes::{self, RawBox, TopLevelBox, fourcc, read_i32, read_u32, read_u64};
+use super::model::{AudioInfo, LayoutSpan, SpanKind, VideoInfo};
 
 pub struct ParsedFile {
     pub duration_secs: Option<f64>,
