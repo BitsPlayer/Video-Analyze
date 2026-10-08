@@ -1,86 +1,49 @@
 # BitPlay
 
-A Rust application for analyzing and processing MP4 video files. BitPlay reads MP4 metadata and retrieves detailed video information using ffprobe.
+BitPlay reads an MP4 and reports its layout: top-level boxes, track metadata, and where each sample sits in the file. It does this from the container index. The media bytes inside `mdat` stay on disk.
 
-## Prerequisites
+A file whose `moov` was cut off still produces a top-level box map, so a caller can see that the index is gone and hand the file to a carver. BitsPlayer uses this library for the Analyze view. The `BitPlay` binary prints the same analysis.
 
-- Rust (1.70+)
-- Cargo
-- ffprobe (for video metadata extraction)
+## Inspect a file
 
-### Installing ffprobe
-
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt-get install ffmpeg
-```
-
-**macOS:**
-```bash
-brew install ffmpeg
-```
-
-**Windows:**
-Download from [ffmpeg.org](https://ffmpeg.org/download.html) or use a package manager like Chocolatey.
-
-## Building
-
-Build the project in release mode:
+![Point BitPlay at an MP4 and read the layout](docs/diagrams/session.svg)
 
 ```bash
-cargo build 
+cargo run --release -- clip.mp4
 ```
 
-The compiled binary will be located at `target/release/BitPlay`.
+The binary is `target/release/BitPlay`. It prints file size, duration, timescale, the video track (codec, resolution, frame rate, sample count, I-frame count, GOP count), the audio track when one is indexed, and byte totals for I, P, B, and audio samples.
 
-## Running
+When `moov` is absent the printout says the file looks truncated and points at iframe extraction.
 
-### Basic Usage
+## How the program is put together
 
-Run the application with an MP4 file:
+![CLI, analyze use case, layout model, and the file walker](docs/diagrams/layers.svg)
+
+| Layer | Role |
+| --- | --- |
+| `src/presentation/` | The CLI. Prints one `Analysis`. |
+| `src/application/` | `analyze`. Asks a `BoxSource` for top-level boxes, then builds the layout. |
+| `src/domain/` | Sample tables, GOP marks, and spans. No filesystem. |
+| `src/infrastructure/` | Walks the file. Reads `moov` and `moof` payloads. Does not read `mdat` media. |
+
+The library entry point is `bitplay::analyze`. The only runtime dependency is `anyhow`.
+
+## What gets read
+
+![Headers for every box, payloads for moov and moof, media bytes left unread](docs/diagrams/layout.svg)
+
+The walker seeks to each top-level box, reads its header, and records offset, size, and fourcc. For `moov` and `moof` it also reads the payload, clamped to the bytes that are actually in the file. For `mdat` it records the header and skips the payload.
+
+`domain::build` turns a present `moov` into track info and one span per sample. Sync samples are I-frames. Other video samples are P or B from the composition timestamps. Audio samples are their own span. Each video span carries the GOP index it belongs to.
+
+Without `moov`, the span list is the box map: `ftyp`, the `mdat` header, `free` / `skip` / `wide`, and anything else at the top level. `moov_present` is false. Duration and track info are absent.
+
+## Build
 
 ```bash
-cargo run -- <path-to-video.mp4>
+cargo build --release
+cargo test
 ```
 
-Example:
-```bash
-cargo run -- test.mp4
-```
-
-### Direct Execution
-
-After building, you can run the binary directly:
-
-```bash
-./target/release/BitPlay test.mp4
-```
-
-## Testing
-
-To test with a sample MP4 file:
-
-```bash
-cargo run -- test.mp4
-```
-
-This will:
-1. Parse the MP4 file structure
-2. Extract metadata using ffprobe
-3. Display video information (duration, FPS, codec profile, encoder, etc.)
-
-## Project Structure
-
-- `src/main.rs` - Main application entry point
-- `Cargo.toml` - Project dependencies and configuration
-
-## Dependencies
-
-- **mp4** (0.14) - MP4 file format parsing
-- **anyhow** (1.0) - Error handling
-- **serde** (1.0) - Serialization framework
-- **serde_json** (1.0) - JSON processing
-
-## License
-
-MIT
+`cargo test` includes a truncated file with `ftyp` and `mdat` and no `moov`, and checks that the box map still comes back.

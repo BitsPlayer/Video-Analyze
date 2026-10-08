@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img">
+  <title>Inspect an MP4</title>
+  <desc>Point BitPlay at a file. It prints duration, tracks, and a byte map. A file without moov still yields the top-level boxes.</desc>
+  <rect width="960" height="480" fill="#f4f1ea"/>
+  <text x="40" y="44" fill="#1c1915" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="650">Inspect an MP4</text>
+  <text x="40" y="68" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Media bytes inside mdat stay unread. The index in moov places each sample.</text>
+
+  <line x1="78" y1="104" x2="78" y2="420" stroke="#d9d3c7" stroke-width="2"/>
+
+  <g font-family="ui-sans-serif, system-ui, sans-serif">
+    <circle cx="78" cy="128" r="14" fill="#3d6b7a"/>
+    <text x="78" y="133" text-anchor="middle" fill="#fffcf7" font-size="12" font-weight="650">1</text>
+    <rect x="112" y="100" width="420" height="72" rx="10" fill="#fffcf7" stroke="#d9d3c7"/>
+    <text x="132" y="130" fill="#1c1915" font-size="15" font-weight="650">Point it at a file</text>
+    <text x="132" y="152" fill="#6b645c" font-size="13">cargo run -- clip.mp4</text>
+
+    <circle cx="78" cy="236" r="14" fill="#3d6b7a"/>
+    <text x="78" y="241" text-anchor="middle" fill="#fffcf7" font-size="12" font-weight="650">2</text>
+    <rect x="112" y="196" width="420" height="96" rx="10" fill="#fffcf7" stroke="#d9d3c7"/>
+    <text x="132" y="226" fill="#1c1915" font-size="15" font-weight="650">Read the printout</text>
+    <text x="132" y="248" fill="#6b645c" font-size="13">Size, duration, timescale, video and audio tracks,</text>
+    <text x="132" y="266" fill="#6b645c" font-size="13">then I, P, and B counts with their byte totals.</text>
+
+    <circle cx="78" cy="364" r="14" fill="#8a5a12"/>
+    <text x="78" y="369" text-anchor="middle" fill="#fffcf7" font-size="12" font-weight="650">3</text>
+    <rect x="112" y="316" width="420" height="96" rx="10" fill="#fffcf7" stroke="#e4d3b0"/>
+    <text x="132" y="346" fill="#1c1915" font-size="15" font-weight="650">A cut file still maps</text>
+    <text x="132" y="368" fill="#6b645c" font-size="13">Without moov there is no sample index. The tool</text>
+    <text x="132" y="386" fill="#6b645c" font-size="13">prints the boxes it could see and says so.</text>
+  </g>
+
+  <rect x="568" y="100" width="352" height="312" rx="10" fill="#fffcf7" stroke="#d9d3c7"/>
+  <text x="592" y="136" fill="#1c1915" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="650">What the library returns</text>
+  <text x="592" y="172" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">file size and whether moov was present</text>
+  <text x="592" y="198" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">duration and movie timescale</text>
+  <text x="592" y="224" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">video track: codec, size, fps, samples, GOPs</text>
+  <text x="592" y="250" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">audio track: codec and sample count</text>
+  <text x="592" y="276" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">spans: ftyp, moov, free, mdat header,</text>
+  <text x="592" y="296" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">then each sample as I, P, B, or audio</text>
+  <text x="592" y="336" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">BitsPlayer draws those spans as the file map.</text>
+  <text x="592" y="368" fill="#6b645c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Frame pixels come from iframe-extract.</text>
+</svg>
