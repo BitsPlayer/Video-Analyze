@@ -1,4 +1,4 @@
-//! MP4 layout analysis: top-level boxes, sample tables, GOP structure.
+//! MP4/MOV layout analysis: top-level boxes, sample tables, GOP structure.
 //!
 //! Media bytes in `mdat` are never read. A truncated file without `moov` still
 //! yields a top-level box map so the GUI can point the user at extraction.

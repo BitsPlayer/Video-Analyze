@@ -5,14 +5,14 @@ use std::env;
 pub fn run() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        println!("Usage: cargo run -- <video.mp4>");
+        println!("Usage: cargo run -- <video.mp4|video.mov>");
         return Ok(());
     }
     let path = &args[1];
     let analysis = bitplay::analyze(path.as_ref())?;
 
     println!("\n==============================");
-    println!("          MP4 METADATA");
+    println!("        MP4/MOV METADATA");
     println!("==============================\n");
     println!("File:");
     println!("{path}");

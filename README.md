@@ -1,12 +1,12 @@
 # BitPlay
 
-BitPlay reads an MP4 and reports its layout: top-level boxes, track metadata, and where each sample sits in the file. It does this from the container index. The media bytes inside `mdat` stay on disk.
+BitPlay reads an MP4 or QuickTime MOV, H.264 or H.265, and reports its layout: top-level boxes, track metadata, and where each sample sits in the file. It does this from the container index. The media bytes inside `mdat` stay on disk.
 
 A file whose `moov` was cut off still produces a top-level box map, so a caller can see that the index is gone and hand the file to a carver. BitsPlayer uses this library for the Analyze view. The `BitPlay` binary prints the same analysis.
 
 ## Inspect a file
 
-![Point BitPlay at an MP4 and read the layout](docs/diagrams/session.svg)
+![Point BitPlay at an MP4 or MOV and read the layout](docs/diagrams/session.svg)
 
 ```bash
 cargo run --release -- clip.mp4
@@ -35,7 +35,7 @@ The library entry point is `bitplay::analyze`. The only runtime dependency is `a
 
 The walker seeks to each top-level box, reads its header, and records offset, size, and fourcc. For `moov` and `moof` it also reads the payload, clamped to the bytes that are actually in the file. For `mdat` it records the header and skips the payload.
 
-`domain::build` turns a present `moov` into track info and one span per sample. Sync samples are I-frames. Other video samples are P or B from the composition timestamps. Audio samples are their own span. Each video span carries the GOP index it belongs to.
+`domain::build` turns a present `moov` into track info and one span per sample. The profile comes from `avcC` for H.264 and `hvcC` for H.265. MOV uses the same box layout, so it takes the same path. Sync samples are I-frames. Other video samples are P or B from the composition timestamps. Audio samples are their own span. Each video span carries the GOP index it belongs to.
 
 Without `moov`, the span list is the box map: `ftyp`, the `mdat` header, `free` / `skip` / `wide`, and anything else at the top level. `moov_present` is false. Duration and track info are absent.
 

@@ -1,4 +1,4 @@
-//! Domain layer: in-memory MP4 layout model. No filesystem access.
+//! Domain layer: in-memory MP4/MOV layout model. No filesystem access.
 
 mod format;
 mod layout;

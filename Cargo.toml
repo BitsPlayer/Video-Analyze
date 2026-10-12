@@ -2,7 +2,7 @@
 name = "BitPlay"
 version = "0.1.0"
 edition = "2024"
-description = "MP4 layout analysis: box map, sample tables, GOP structure"
+description = "MP4/MOV layout analysis: box map, sample tables, GOP structure"
 
 [lib]
 name = "bitplay"

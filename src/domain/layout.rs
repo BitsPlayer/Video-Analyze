@@ -317,8 +317,11 @@ fn parse_stsd(b: RawBox<'_>) -> (String, Option<String>, (u32, u32)) {
     }
     if entry.payload.len() > 78 {
         for child in boxes::iter_boxes(&entry.payload[78..], 0) {
-            if child.is_type(b"avcC") && !child.payload.is_empty() {
+            if child.is_type(b"avcC") && child.payload.len() > 1 {
                 profile = Some(avc_profile_name(child.payload[1]));
+            }
+            if child.is_type(b"hvcC") && child.payload.len() > 1 {
+                profile = Some(hevc_profile_name(child.payload[1] & 0x1f));
             }
         }
     }
@@ -334,6 +337,16 @@ fn avc_profile_name(idc: u8) -> String {
         110 => "High 10".into(),
         122 => "High 4:2:2".into(),
         244 => "High 4:4:4".into(),
+        other => format!("profile {other}"),
+    }
+}
+
+fn hevc_profile_name(idc: u8) -> String {
+    match idc {
+        1 => "Main".into(),
+        2 => "Main 10".into(),
+        3 => "Main Still Picture".into(),
+        4 => "Range Extensions".into(),
         other => format!("profile {other}"),
     }
 }
